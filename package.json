@@ -1,6 +1,6 @@
 {
   "name": "travis-got",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Convenience wrapper for `got` to interact with the Travis API",
   "license": "MIT",
   "repository": "SamVerschueren/travis-got",
