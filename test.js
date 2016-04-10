@@ -1,26 +1,36 @@
 import test from 'ava';
 import getStream from 'get-stream';
-import fn from './';
+import m from './';
 
-global.Promise = Promise;
+const token = process.env.TRAVIS_TOKEN;
 
 test('default', async t => {
-	t.is((await fn('repos/SamVerschueren/travis-got')).body.repo.slug, 'SamVerschueren/travis-got');
+	t.is((await m('repos/SamVerschueren/travis-got')).body.repo.slug, 'SamVerschueren/travis-got');
 });
 
 test('full path', async t => {
-	t.is((await fn('https://api.travis-ci.org/repos/SamVerschueren/travis-got')).body.repo.slug, 'SamVerschueren/travis-got');
+	t.is((await m('https://api.travis-ci.org/repos/SamVerschueren/travis-got')).body.repo.slug, 'SamVerschueren/travis-got');
 });
 
 test('should accept options', async t => {
-	t.is((await fn('repos/SamVerschueren/travis-got', {})).body.repo.slug, 'SamVerschueren/travis-got');
+	t.is((await m('repos/SamVerschueren/travis-got', {})).body.repo.slug, 'SamVerschueren/travis-got');
 });
 
-test('endpoint option', async t => {
-	await t.throws(fn('repos/SamVerschueren/travis-got', {endpoint: 'fail', retries: 1}), /ENOTFOUND/);
+test.serial('global token option', async t => {
+	process.env.TRAVIS_TOKEN = 'fail';
+	await t.throws(m('repos/SamVerschueren/travis-got'), 'Response code 401 (Unauthorized)');
+	process.env.TRAVIS_TOKEN = token;
+});
+
+test('token option', t => {
+	t.throws(m('repos/SamVerschueren/travis-got', {token: 'fail'}), 'Response code 401 (Unauthorized)');
+});
+
+test('endpoint option', t => {
+	t.throws(m('repos/SamVerschueren/travis-got', {endpoint: 'fail', retries: 1}), /ENOTFOUND/);
 });
 
 test('stream interface', async t => {
-	t.is(JSON.parse(await getStream(fn.stream('repos/SamVerschueren/travis-got'))).repo.slug, 'SamVerschueren/travis-got');
-	t.is(JSON.parse(await getStream(fn.stream.get('repos/SamVerschueren/travis-got'))).repo.slug, 'SamVerschueren/travis-got');
+	t.is(JSON.parse(await getStream(m.stream('repos/SamVerschueren/travis-got'))).repo.slug, 'SamVerschueren/travis-got');
+	t.is(JSON.parse(await getStream(m.stream.get('repos/SamVerschueren/travis-got'))).repo.slug, 'SamVerschueren/travis-got');
 });

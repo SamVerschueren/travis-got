@@ -64,7 +64,7 @@ Can be overridden globally with the TRAVIS_TOKEN environment variable.
 
 ### endpoint
 
-Type: `string`  
+Type: `string`<br>
 Default: `https://api.travis-ci.org/`
 
 To support [Travis Enterprise](https://enterprise.travis-ci.com/).

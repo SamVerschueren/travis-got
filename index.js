@@ -1,29 +1,27 @@
 'use strict';
-var got = require('got');
-var objectAssign = require('object-assign');
-var Promise = require('pinkie-promise');
+const got = require('got');
 
 function travisGot(path, opts) {
 	if (typeof path !== 'string') {
 		return Promise.reject(new TypeError('Path should be a string'));
 	}
 
-	opts = objectAssign({json: true, endpoint: 'https://api.travis-ci.org/'}, opts);
+	opts = Object.assign({json: true, endpoint: 'https://api.travis-ci.org/'}, opts);
 
-	opts.headers = objectAssign({
+	opts.headers = Object.assign({
 		'accept': 'application/vnd.travis-ci.2+json',
 		'user-agent': 'https://github.com/SamVerschueren/travis-got'
 	}, opts.headers);
 
-	var env = process.env;
-	var token = env.TRAVIS_TOKEN || opts.token;
+	const env = process.env;
+	const token = opts.token || env.TRAVIS_TOKEN;
 
 	if (token) {
-		opts.headers.authorization = 'token ' + token;
+		opts.headers.authorization = `token ${token}`;
 	}
 
-	var endpoint = env.TRAVIS_ENDPOINT ? env.TRAVIS_ENDPOINT.replace(/[^/]$/, '$&/') : opts.endpoint;
-	var url = /https?/.test(path) ? path : endpoint + path;
+	const endpoint = env.TRAVIS_ENDPOINT ? env.TRAVIS_ENDPOINT.replace(/[^/]$/, '$&/') : opts.endpoint;
+	const url = /https?/.test(path) ? path : endpoint + path;
 
 	if (opts.stream) {
 		return got.stream(url, opts);
@@ -32,7 +30,7 @@ function travisGot(path, opts) {
 	return got(url, opts);
 }
 
-var helpers = [
+const helpers = [
 	'get',
 	'post',
 	'put',
@@ -41,20 +39,12 @@ var helpers = [
 	'delete'
 ];
 
-helpers.forEach(function (el) {
-	travisGot[el] = function (url, opts) {
-		return travisGot(url, objectAssign({}, opts, {method: el.toUpperCase()}));
-	};
-});
+travisGot.stream = (url, opts) => travisGot(url, Object.assign({}, opts, {json: false, stream: true}));
 
-travisGot.stream = function (url, opts) {
-	return travisGot(url, objectAssign({}, opts, {json: false, stream: true}));
-};
-
-helpers.forEach(function (el) {
-	travisGot.stream[el] = function (url, opts) {
-		return travisGot.stream(url, objectAssign({}, opts, {method: el.toUpperCase()}));
-	};
-});
+for (const x of helpers) {
+	const method = x.toUpperCase();
+	travisGot[x] = (url, opts) => travisGot(url, Object.assign({}, opts, {method}));
+	travisGot.stream[x] = (url, opts) => travisGot.stream(url, Object.assign({}, opts, {method}));
+}
 
 module.exports = travisGot;
