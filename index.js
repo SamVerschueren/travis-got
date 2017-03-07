@@ -27,7 +27,17 @@ function travisGot(path, opts) {
 		return got.stream(url, opts);
 	}
 
-	return got(url, opts);
+	return got(url, opts).catch(err => {
+		// In case of an invalid access token, Travis CI responds with
+		// 403 Forbidden and a non-JSON body which causes got to throw a ParseError
+		// instead of an HTTPError. To avoid this, we manually throw an HTTPError
+		// if the status code is 403 Forbidden.
+		if (err.statusCode !== 403) {
+			throw err;
+		}
+
+		throw new got.HTTPError(err.statusCode, err);
+	});
 }
 
 const helpers = [
