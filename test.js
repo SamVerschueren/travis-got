@@ -18,16 +18,16 @@ test('should accept options', async t => {
 
 test.serial('global token option', async t => {
 	process.env.TRAVIS_TOKEN = 'fail';
-	await t.throws(m('repos/SamVerschueren/travis-got'), 'Response code 401 (Unauthorized)');
-	process.env.TRAVIS_TOKEN = token;
+	await t.throws(m('repos/SamVerschueren/travis-got'), 'Response code 403 (Forbidden)');
+	process.env.TRAVIS_TOKEN = token || '';
 });
 
-test('token option', t => {
-	t.throws(m('repos/SamVerschueren/travis-got', {token: 'fail'}), 'Response code 401 (Unauthorized)');
+test('token option', async t => {
+	await t.throws(m('repos/SamVerschueren/travis-got', {token: 'fail'}), 'Response code 403 (Forbidden)');
 });
 
-test('endpoint option', t => {
-	t.throws(m('repos/SamVerschueren/travis-got', {endpoint: 'fail', retries: 1}), /ENOTFOUND/);
+test('endpoint option', async t => {
+	await t.throws(m('repos/SamVerschueren/travis-got', {endpoint: 'fail', retries: 1}), /ENOTFOUND/);
 });
 
 test('stream interface', async t => {

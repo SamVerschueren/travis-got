@@ -33,7 +33,7 @@
     "utility"
   ],
   "dependencies": {
-    "got": "^6.3.0"
+    "got": "^7.0.0"
   },
   "devDependencies": {
     "ava": "*",

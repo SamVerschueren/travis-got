@@ -9,7 +9,7 @@ function travisGot(path, opts) {
 	opts = Object.assign({json: true, endpoint: 'https://api.travis-ci.org/'}, opts);
 
 	opts.headers = Object.assign({
-		'accept': 'application/vnd.travis-ci.2+json',
+		accept: 'application/vnd.travis-ci.2+json',
 		'user-agent': 'https://github.com/SamVerschueren/travis-got'
 	}, opts.headers);
 
