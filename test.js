@@ -19,7 +19,7 @@ test('should accept options', async t => {
 test.serial('global token option', async t => {
 	process.env.TRAVIS_TOKEN = 'fail';
 	await t.throws(m('repos/SamVerschueren/travis-got'), 'Response code 403 (Forbidden)');
-	process.env.TRAVIS_TOKEN = token;
+	process.env.TRAVIS_TOKEN = token || '';
 });
 
 test('token option', async t => {
